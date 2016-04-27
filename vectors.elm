@@ -38,3 +38,6 @@ ycomp (Vector2D _ y) = y
 
 norm : Vector2D -> Float
 norm x = sqrt <| x .*. x
+
+polar2Cartesian : (Float, Float) -> Vector2D
+polar2Cartesian (r, phi) = Vector2D (r * cos phi) (r * sin phi)
