@@ -1,0 +1,26 @@
+<html lang="pl">
+  <head>
+		<meta charset="UTF-8">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>Siły pływowe</title>
+    <script type="text/javascript" src="tidial.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div id="help">
+      Przyciśnij klawisz myszy i przeciągnij aby dodać nowy obiekt.
+
+      <div style="position:absolute; top: 530px; left: 0px">
+        <a href="index.html" class="button"><span>Koniec gry</span></a>
+      </div>
+    </div>
+    <div id="game" style="width:800px; height:600px;"></div>
+  </body>
+
+  <script type="text/javascript">
+    var div = document.getElementById("game");
+    Elm.embed(Elm.Tidial, div);
+  </script>
+
+</html>
