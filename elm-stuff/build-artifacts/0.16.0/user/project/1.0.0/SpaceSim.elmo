@@ -1,0 +1,163 @@
+Elm.SpaceSim = Elm.SpaceSim || {};
+Elm.SpaceSim.make = function (_elm) {
+   "use strict";
+   _elm.SpaceSim = _elm.SpaceSim || {};
+   if (_elm.SpaceSim.values) return _elm.SpaceSim.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Color = Elm.Color.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Vectors = Elm.Vectors.make(_elm);
+   var _op = {};
+   var drawSun = A2($Graphics$Collage.filled,$Color.yellow,A2($Graphics$Collage.oval,20,20));
+   var eccentricAnomaly$ = F4(function (elements,ma,ea,k) {
+      eccentricAnomaly$: while (true) {
+         var ea$ = ma + elements.e * $Basics.sin(ea);
+         if (_U.cmp(k,0) > 0) {
+               var _v0 = elements,_v1 = ma,_v2 = ea$,_v3 = k - 1;
+               elements = _v0;
+               ma = _v1;
+               ea = _v2;
+               k = _v3;
+               continue eccentricAnomaly$;
+            } else return ea;
+      }
+   });
+   var eccentricAnomaly = F2(function (elements,ma) {    return A4(eccentricAnomaly$,elements,ma,ma,10);});
+   var getHCPosition = function (elements) {
+      var meanLongitude = elements.meanL;
+      var meanAnomaly = meanLongitude - elements.omega;
+      var ea = A2(eccentricAnomaly,elements,meanAnomaly);
+      var e = elements.e;
+      var tanlong2 = $Basics.sqrt((1 + e) / (1 - e)) * $Basics.tan(ea / 2);
+      return {ctor: "_Tuple2",_0: elements.sma * (1 - e * $Basics.cos(ea)),_1: elements.omega + 2 * $Basics.atan(tanlong2)};
+   };
+   var getPosition = function (elements) {
+      var _p0 = getHCPosition(elements);
+      var r = _p0._0;
+      var phi = _p0._1;
+      return A2($Vectors.Vector2D,r * $Basics.cos(phi),r * $Basics.sin(phi));
+   };
+   var semiMinorAxis = function (orbit) {    return orbit.sma * $Basics.sqrt(1 - Math.pow(orbit.e,2));};
+   var getVelocity = F2(function (gm,elements) {
+      var p = Math.pow(semiMinorAxis(elements),2) / elements.sma;
+      var h = $Basics.sqrt(gm * p);
+      var _p1 = getHCPosition(elements);
+      var r = _p1._0;
+      var nu$ = _p1._1;
+      var nu = nu$ - elements.omega;
+      var vr = gm * elements.e * $Basics.sin(nu) / h;
+      var vtheta = h / r;
+      return A2($Vectors.Vector2D,vr * $Basics.cos(nu$) - vtheta * $Basics.sin(nu$),vr * $Basics.sin(nu$) + vtheta * $Basics.cos(nu$));
+   });
+   var objectFromElements = F4(function (gm,renderer,size,orbit) {
+      var v = A2(getVelocity,gm,orbit);
+      return {renderer: renderer
+             ,color: $Color.blue
+             ,size: size
+             ,orbit: orbit
+             ,position: getPosition(orbit)
+             ,velocity: v
+             ,orientation: A2($Basics.atan2,$Vectors.ycomp(v),$Vectors.xcomp(v))};
+   });
+   var drawOrbit = F2(function (color,elements) {
+      var omega = elements.omega;
+      var b = semiMinorAxis(elements);
+      var a = elements.sma;
+      var c = a * elements.e;
+      var orbitShape = A2($Graphics$Collage.outlined,$Graphics$Collage.dashed(color),A2($Graphics$Collage.oval,2 * a,2 * b));
+      return A2($Graphics$Collage.move,
+      {ctor: "_Tuple2",_0: (0 - c) * $Basics.cos(omega),_1: (0 - c) * $Basics.sin(omega)},
+      A2($Graphics$Collage.rotate,omega,orbitShape));
+   });
+   var drawObject = F2(function (drawOrbits,object) {
+      var xy = $Vectors.toTuple(object.position);
+      var obj = A2($Graphics$Collage.move,xy,A2($Graphics$Collage.rotate,object.orientation,object.renderer));
+      return drawOrbits ? $Graphics$Collage.group(_U.list([obj,A2(drawOrbit,object.color,object.orbit)])) : obj;
+   });
+   var orbitFromState = F3(function (gm,r,v) {
+      var rv = A2($Vectors._op[".*."],r,v);
+      var h2 = Math.pow(A2($Vectors.exterior,r,v),2);
+      var v2 = A2($Vectors._op[".*."],v,v);
+      var rr = $Basics.sqrt(A2($Vectors._op[".*."],r,r));
+      var energy = v2 / 2 - gm / rr;
+      var sma = -1.0 * gm / (2 * energy);
+      var ecc = $Basics.sqrt(1 + 2 * energy * h2 / Math.pow(gm,2));
+      var e = A2($Vectors._op["*."],1 / gm,A2($Vectors._op[".+."],A2($Vectors._op["*."],v2 - gm / rr,r),A2($Vectors._op["*."],0 - rv,v)));
+      var er = A2($Vectors._op[".*."],e,r);
+      var omega$ = _U.cmp($Vectors.ycomp(e),0) > 0 ? $Basics.acos($Vectors.xcomp(e) / ecc) : 2 * $Basics.pi - $Basics.acos($Vectors.xcomp(e) / ecc);
+      var omega = $Basics.isNaN(omega$) ? 0 : omega$;
+      var nu$ = $Basics.acos(er / (ecc * rr));
+      var nu = _U.cmp(rv,0) < 0 ? nu$ : 2 * $Basics.pi - nu$;
+      var eaarg = (1 - rr / sma) / ecc;
+      var eccentricAnomaly = _U.cmp(nu,$Basics.pi) > 0 ? $Basics.acos(eaarg) : 2 * $Basics.pi - $Basics.acos(eaarg);
+      var meanAnomaly = eccentricAnomaly - ecc * $Basics.sin(eccentricAnomaly);
+      var meanL = meanAnomaly + omega;
+      return {sma: sma,e: ecc,omega: omega,meanL: meanL};
+   });
+   var gravityG = F2(function (gm,r) {
+      var r2 = A2($Vectors._op[".*."],r,r);
+      var er = A2($Vectors._op["*."],1 / $Basics.sqrt(r2),r);
+      return A2($Vectors._op["*."],-1.0 * gm / r2,er);
+   });
+   var rk4 = F3(function (h,_p2,a) {
+      var _p3 = _p2;
+      var _p5 = _p3._1;
+      var _p4 = _p3._0;
+      var k1r = _p5;
+      var k2v = a(A2($Vectors._op[".+."],_p4,A2($Vectors._op["*."],h / 2,k1r)));
+      var k3r = A2($Vectors._op[".+."],_p5,A2($Vectors._op["*."],h / 2,k2v));
+      var k4v = a(A2($Vectors._op[".+."],_p4,A2($Vectors._op["*."],h,k3r)));
+      var k1v = a(_p4);
+      var k2r = A2($Vectors._op[".+."],_p5,A2($Vectors._op["*."],h / 2,k1v));
+      var k3v = a(A2($Vectors._op[".+."],_p4,A2($Vectors._op["*."],h / 2,k2r)));
+      var k4r = A2($Vectors._op[".+."],_p5,A2($Vectors._op["*."],h,k3v));
+      return {ctor: "_Tuple2"
+             ,_0: A2($Vectors._op[".+."],
+             _p4,
+             A2($Vectors._op["*."],
+             h / 6,
+             A2($Vectors._op[".+."],A2($Vectors._op[".+."],A2($Vectors._op[".+."],k1r,A2($Vectors._op["*."],2,k2r)),A2($Vectors._op["*."],2,k3r)),k4r)))
+             ,_1: A2($Vectors._op[".+."],
+             _p5,
+             A2($Vectors._op["*."],
+             h / 6,
+             A2($Vectors._op[".+."],A2($Vectors._op[".+."],A2($Vectors._op[".+."],k1v,A2($Vectors._op["*."],2,k2v)),A2($Vectors._op["*."],2,k3v)),k4v)))};
+   });
+   var updateObject = F5(function (gm,dt,rotation,thurst,ship) {
+      var thurstV = A2($Vectors._op["*."],thurst,A2($Vectors.Vector2D,$Basics.cos(ship.orientation),$Basics.sin(ship.orientation)));
+      var force = function (r) {    return A2($Vectors._op[".+."],A2(gravityG,gm,r),thurstV);};
+      var _p6 = A3(rk4,dt,{ctor: "_Tuple2",_0: ship.position,_1: ship.velocity},force);
+      var r = _p6._0;
+      var v = _p6._1;
+      return _U.update(ship,
+      {position: r
+      ,velocity: v
+      ,orientation: ship.orientation + rotation * dt
+      ,orbit: _U.cmp($Basics.abs(thurst),1.0e-6) > 0 ? A3(orbitFromState,gm,r,v) : ship.orbit});
+   });
+   var Orbit = F4(function (a,b,c,d) {    return {sma: a,e: b,omega: c,meanL: d};});
+   var Object = F7(function (a,b,c,d,e,f,g) {    return {renderer: a,size: b,color: c,orbit: d,position: e,velocity: f,orientation: g};});
+   return _elm.SpaceSim.values = {_op: _op
+                                 ,Object: Object
+                                 ,Orbit: Orbit
+                                 ,rk4: rk4
+                                 ,gravityG: gravityG
+                                 ,updateObject: updateObject
+                                 ,orbitFromState: orbitFromState
+                                 ,semiMinorAxis: semiMinorAxis
+                                 ,getVelocity: getVelocity
+                                 ,getHCPosition: getHCPosition
+                                 ,getPosition: getPosition
+                                 ,eccentricAnomaly: eccentricAnomaly
+                                 ,eccentricAnomaly$: eccentricAnomaly$
+                                 ,drawObject: drawObject
+                                 ,drawOrbit: drawOrbit
+                                 ,drawSun: drawSun
+                                 ,objectFromElements: objectFromElements};
+};

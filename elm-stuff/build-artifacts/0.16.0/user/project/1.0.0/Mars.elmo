@@ -1,0 +1,109 @@
+Elm.Mars = Elm.Mars || {};
+Elm.Mars.make = function (_elm) {
+   "use strict";
+   _elm.Mars = _elm.Mars || {};
+   if (_elm.Mars.values) return _elm.Mars.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Color = Elm.Color.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
+   $Graphics$Element = Elm.Graphics.Element.make(_elm),
+   $Keyboard = Elm.Keyboard.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $SpaceSim = Elm.SpaceSim.make(_elm),
+   $Time = Elm.Time.make(_elm),
+   $Vectors = Elm.Vectors.make(_elm),
+   $Window = Elm.Window.make(_elm);
+   var _op = {};
+   var delta = A2($Signal.map,$Time.inSeconds,$Time.fps(35));
+   var gameHeight = 600;
+   var gameWidth = 800;
+   var destroyedRenderer = $Graphics$Collage.toForm(A3($Graphics$Element.fittedImage,15,15,"spaceship-destroyed.gif"));
+   var shipPRenderer = $Graphics$Collage.toForm(A3($Graphics$Element.fittedImage,20,20,"spaceship-propelled.gif"));
+   var shipRenderer = $Graphics$Collage.toForm(A3($Graphics$Element.fittedImage,15,15,"spaceship.gif"));
+   var sunRenderer = $Graphics$Collage.toForm(A3($Graphics$Element.fittedImage,40,40,"sun.gif"));
+   var sun = {renderer: sunRenderer
+             ,size: 20
+             ,orbit: {sma: 0,e: 0,omega: 0,meanL: 0}
+             ,color: $Color.yellow
+             ,position: A2($Vectors.Vector2D,0,0)
+             ,velocity: A2($Vectors.Vector2D,0,0)
+             ,orientation: 0};
+   var view = F2(function (_p0,system) {
+      var _p1 = _p0;
+      var spaceship = _U.list([A2($SpaceSim.drawObject,system.drawOrbits,system.spaceship)]);
+      var planets = A2($List.map,$SpaceSim.drawObject(system.drawOrbits),system.planets);
+      var $static = _U.list([A2($Graphics$Collage.filled,$Color.black,A2($Graphics$Collage.rect,gameWidth,gameHeight)),A2($SpaceSim.drawObject,false,sun)]);
+      return A4($Graphics$Element.container,
+      _p1._0,
+      _p1._1,
+      $Graphics$Element.middle,
+      A3($Graphics$Collage.collage,gameWidth,gameHeight,$List.concat(_U.list([$static,planets,spaceship]))));
+   });
+   var au = 150;
+   var elementsEarth = {sma: au,e: 1.7e-2,omega: $Basics.degrees(103),meanL: $Basics.degrees(100)};
+   var elementsMars = {sma: 1.52 * au,e: 9.3e-2,omega: $Basics.degrees(336),meanL: $Basics.degrees(355)};
+   var earthT = 36;
+   var gm = 4 * Math.pow($Basics.pi,2) * Math.pow(au,3) / Math.pow(earthT,2);
+   var earth = {renderer: A2($Graphics$Collage.filled,$Color.green,A2($Graphics$Collage.oval,10,10))
+               ,size: 5
+               ,orbit: elementsEarth
+               ,color: $Color.blue
+               ,position: $SpaceSim.getPosition(elementsEarth)
+               ,velocity: A2($SpaceSim.getVelocity,gm,elementsEarth)
+               ,orientation: 0};
+   var mars = {renderer: A2($Graphics$Collage.filled,$Color.red,A2($Graphics$Collage.oval,5,5))
+              ,size: 2
+              ,orbit: elementsMars
+              ,color: $Color.blue
+              ,position: $SpaceSim.getPosition(elementsMars)
+              ,velocity: A2($SpaceSim.getVelocity,gm,elementsMars)
+              ,orientation: 0};
+   var spaceship = {renderer: shipRenderer
+                   ,size: 7.5
+                   ,orbit: elementsEarth
+                   ,color: $Color.green
+                   ,position: $SpaceSim.getPosition(elementsEarth)
+                   ,velocity: A2($SpaceSim.getVelocity,gm,elementsEarth)
+                   ,orientation: $Basics.pi / 4};
+   var system = {planets: _U.list([earth,mars]),spaceship: spaceship,drawOrbits: false};
+   var accel = 1;
+   var rotationSpeed = -1 * $Basics.degrees(360);
+   var update = F2(function (input,system) {
+      var _p2 = input;
+      if (_p2.ctor === "Simulation") {
+            var _p6 = _p2._0;
+            var _p5 = _p2._1;
+            var _p4 = _p2._3;
+            var _p3 = _p2._2;
+            var rot = _p6 ? -10 * rotationSpeed * $Basics.toFloat(_p5) : rotationSpeed * $Basics.toFloat(_p5);
+            var thurst = _p6 ? 10 * accel * $Basics.toFloat(_p3) : accel * $Basics.toFloat(_p3);
+            var dt = _p6 ? 0.1 * _p4 : _p4;
+            var ship = A5($SpaceSim.updateObject,gm,dt,rot,thurst,system.spaceship);
+            return _U.update(system,
+            {planets: A2($List.map,A4($SpaceSim.updateObject,gm,dt,0,0),system.planets)
+            ,spaceship: _U.update(ship,{renderer: _U.cmp(_p3,0) > 0 ? shipPRenderer : shipRenderer})});
+         } else {
+            return _U.update(system,{drawOrbits: _p2._0 ? $Basics.not(system.drawOrbits) : system.drawOrbits});
+         }
+   });
+   var ToggleOrbits = function (a) {    return {ctor: "ToggleOrbits",_0: a};};
+   var Simulation = F4(function (a,b,c,d) {    return {ctor: "Simulation",_0: a,_1: b,_2: c,_3: d};});
+   var simInput = A2($Signal.sampleOn,
+   delta,
+   A5($Signal.map4,
+   Simulation,
+   $Keyboard.space,
+   A2($Signal.map,function (_) {    return _.x;},$Keyboard.arrows),
+   A2($Signal.map,function (_) {    return _.y;},$Keyboard.arrows),
+   delta));
+   var input = A2($Signal.merge,A2($Signal.map,ToggleOrbits,$Keyboard.isDown(79)),simInput);
+   var simulationState = A3($Signal.foldp,update,system,input);
+   var main = A3($Signal.map2,view,$Window.dimensions,simulationState);
+   var System = F3(function (a,b,c) {    return {planets: a,spaceship: b,drawOrbits: c};});
+   return _elm.Mars.values = {_op: _op,main: main};
+};

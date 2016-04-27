@@ -1,0 +1,25 @@
+Elm.Vectors = Elm.Vectors || {};
+Elm.Vectors.make = function (_elm) {
+   "use strict";
+   _elm.Vectors = _elm.Vectors || {};
+   if (_elm.Vectors.values) return _elm.Vectors.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var ycomp = function (_p0) {    var _p1 = _p0;return _p1._1;};
+   var xcomp = function (_p2) {    var _p3 = _p2;return _p3._0;};
+   var toTuple = function (_p4) {    var _p5 = _p4;return {ctor: "_Tuple2",_0: _p5._0,_1: _p5._1};};
+   var exterior = F2(function (_p7,_p6) {    var _p8 = _p7;var _p9 = _p6;return _p8._0 * _p9._1 - _p8._1 * _p9._0;});
+   _op[".*."] = F2(function (_p11,_p10) {    var _p12 = _p11;var _p13 = _p10;return _p12._0 * _p13._0 + _p12._1 * _p13._1;});
+   var norm = function (x) {    return $Basics.sqrt(A2(_op[".*."],x,x));};
+   var Vector2D = F2(function (a,b) {    return {ctor: "Vector2D",_0: a,_1: b};});
+   _op[".+."] = F2(function (_p15,_p14) {    var _p16 = _p15;var _p17 = _p14;return A2(Vector2D,_p16._0 + _p17._0,_p16._1 + _p17._1);});
+   _op["*."] = F2(function (a,_p18) {    var _p19 = _p18;return A2(Vector2D,a * _p19._0,a * _p19._1);});
+   _op[".-."] = F2(function (x,y) {    return A2(_op[".+."],x,A2(_op["*."],-1.0,y));});
+   return _elm.Vectors.values = {_op: _op,Vector2D: Vector2D,exterior: exterior,toTuple: toTuple,xcomp: xcomp,ycomp: ycomp,norm: norm};
+};
