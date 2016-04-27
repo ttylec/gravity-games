@@ -1,0 +1,66 @@
+@import url(https://fonts.googleapis.com/css?family=Source+Code+Pro&subset=latin,latin-ext);
+body {
+    background: #1D1F21;
+    /* color: #D0D2CE; */
+    color: #A2C8A2;
+    font-family: Source Code Pro;
+    font-size: 10pt
+}
+
+em {
+    color: #98CCFC;
+    font-weight: bold;
+    font-style: normal;
+}
+
+.key {
+    border-radius: 4px;
+    border: 1px solid  #A2C8A2;
+    height: 18px;
+    min-width: 18px;
+    padding-left: 4px;
+    padding-right: 4px;
+    /* margin: 0px; */
+    display: inline-block;
+    vertical-align: center;
+    text-align: center;
+    font-size: 9pt
+}
+
+#help {
+    position: absolute;
+    width: 200px;
+}
+
+#game {
+    position: absolute;
+    left: 240px;
+    top: 0px
+}
+
+.button {
+    border-radius: 4px;
+    border-radius: 4px;
+    border: 1px solid  #A2C8A2;
+    height: 50px;
+    line-height: 50px;
+    min-width: 100px;
+    padding-left: 10px;
+    padding-right: 10px;
+    display: inline-block;
+    vertical-align: middle;
+    text-align: center;
+    font-size: 10pt;
+    text-decoration: none;
+    color: #A2C8A2;
+}
+
+.button .red {
+    border: 1px solid #FC615D;
+    background: #FC615D;
+}
+
+.button span {
+    vertical-align: middle;
+    text-align: center;
+}
