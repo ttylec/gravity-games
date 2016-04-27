@@ -1,0 +1,128 @@
+Elm.Tidial = Elm.Tidial || {};
+Elm.Tidial.make = function (_elm) {
+   "use strict";
+   _elm.Tidial = _elm.Tidial || {};
+   if (_elm.Tidial.values) return _elm.Tidial.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Color = Elm.Color.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Drag = Elm.Drag.make(_elm),
+   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
+   $Graphics$Element = Elm.Graphics.Element.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Random = Elm.Random.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $SpaceSim = Elm.SpaceSim.make(_elm),
+   $Time = Elm.Time.make(_elm),
+   $Vectors = Elm.Vectors.make(_elm),
+   $Window = Elm.Window.make(_elm);
+   var _op = {};
+   var delta = A2($Signal.map,$Time.inSeconds,$Time.fps(35));
+   var sunRenderer = $Graphics$Collage.toForm(A3($Graphics$Element.fittedImage,40,40,"sun.gif"));
+   var randomList = F3(function (gen,s,n) {
+      var _p0 = A2($Random.generate,gen,s);
+      var x = _p0._0;
+      var s$ = _p0._1;
+      var rest = _U.cmp(n,1) > 0 ? A3(randomList,gen,s$,n - 1) : _U.list([]);
+      return A2($List._op["::"],x,rest);
+   });
+   var pairs$ = F2(function (la,b) {    return A2($List.map,function (a) {    return {ctor: "_Tuple2",_0: a,_1: b};},la);});
+   var pairs = F2(function (la,lb) {    return $List.concat(A2($List.map,pairs$(la),lb));});
+   var particle = F2(function (r,v) {
+      return {renderer: A2($Graphics$Collage.filled,$Color.white,$Graphics$Collage.circle(1))
+             ,size: 1
+             ,orbit: {sma: 0,e: 0,omega: 0,meanL: 0}
+             ,color: $Color.yellow
+             ,position: r
+             ,velocity: v
+             ,orientation: 0};
+   });
+   var planet = F2(function (r,v) {
+      var gen = A2($Random.pair,A2($Random.$float,0,10),A2($Random.$float,0,2 * $Basics.pi));
+      var seed = $Random.initialSeed(0);
+      var dr = A2($List.map,$Vectors.polar2Cartesian,A3(randomList,gen,seed,200));
+      return A2($List.map,function (r$) {    return A2(particle,A2($Vectors._op[".+."],r,r$),v);},dr);
+   });
+   var sun = {renderer: sunRenderer
+             ,size: 20
+             ,orbit: {sma: 0,e: 0,omega: 0,meanL: 0}
+             ,color: $Color.yellow
+             ,position: A2($Vectors.Vector2D,0,0)
+             ,velocity: A2($Vectors.Vector2D,0,0)
+             ,orientation: 0};
+   var au = 400;
+   var elementsDefault = {sma: 0.3 * au,e: 0.0,omega: 0,meanL: 0};
+   var startT = 40;
+   var gm = 4 * Math.pow($Basics.pi,2) * Math.pow(au,3) / Math.pow(startT,2);
+   var game = {particles: A2(planet,$SpaceSim.getPosition(elementsDefault),A2($SpaceSim.getVelocity,gm,elementsDefault)),clickXY: A2($Vectors.Vector2D,0,0)};
+   var gameHeight = 600;
+   var gameWidth = 800;
+   var view = F2(function (_p2,_p1) {
+      var _p3 = _p2;
+      var _p4 = _p1;
+      var ps = A2($List.map,$SpaceSim.drawObject(false),_p4.particles);
+      var $static = _U.list([A2($Graphics$Collage.filled,$Color.black,A2($Graphics$Collage.rect,gameWidth,gameHeight)),A2($SpaceSim.drawObject,false,sun)]);
+      return A4($Graphics$Element.container,
+      _p3._0,
+      _p3._1,
+      $Graphics$Element.topLeft,
+      A3($Graphics$Collage.collage,gameWidth,gameHeight,$List.concat(_U.list([$static,ps]))));
+   });
+   var inGameField = function (object) {
+      var y = $Vectors.ycomp(object.position);
+      var x = $Vectors.xcomp(object.position);
+      var r = $Basics.sqrt(A2($Vectors._op[".*."],object.position,object.position));
+      return _U.cmp(r,20) > 0 && (_U.cmp(x,(0 - gameWidth) / 2) > 0 && (_U.cmp(x,gameWidth / 2) < 0 && (_U.cmp(y,(0 - gameHeight) / 2) > 0 && _U.cmp(y,
+      gameHeight / 2) < 0)));
+   };
+   var mouseToVector = function (_p5) {
+      var _p6 = _p5;
+      var y$ = gameHeight / 2 - $Basics.toFloat(_p6._1);
+      var x$ = $Basics.toFloat(_p6._0) - gameWidth / 2;
+      return A2($Vectors.Vector2D,x$,y$);
+   };
+   var insertEvent = F2(function (event,game) {
+      var _p7 = event;
+      _v3_2: do {
+         switch (_p7.ctor)
+         {case "StartAt": if (_p7._0.ctor === "_Tuple2") {
+                    return _U.update(game,{clickXY: mouseToVector({ctor: "_Tuple2",_0: _p7._0._0,_1: _p7._0._1})});
+                 } else {
+                    break _v3_2;
+                 }
+            case "EndAt": if (_p7._0.ctor === "_Tuple2") {
+                    var _p9 = _p7._0._1;
+                    var _p8 = _p7._0._0;
+                    var r = game.clickXY;
+                    var end = mouseToVector({ctor: "_Tuple2",_0: _p8,_1: _p9});
+                    var v = A2($Vectors._op[".-."],end,game.clickXY);
+                    var xx = A2($Debug.watch,"end xy",{ctor: "_Tuple2",_0: _p8,_1: _p9});
+                    return _U.update(game,{particles: A2($List.append,A2(planet,r,v),game.particles)});
+                 } else {
+                    break _v3_2;
+                 }
+            default: break _v3_2;}
+      } while (false);
+      return game;
+   });
+   var update = F2(function (input,game) {
+      var _p10 = input;
+      if (_p10.ctor === "Simulation") {
+            var particles$ = A2($List.filter,inGameField,A2($List.map,A4($SpaceSim.updateObject,gm,_p10._0,0,0),game.particles));
+            return _U.update(game,{particles: particles$});
+         } else {
+            return A2(insertEvent,_p10._0,game);
+         }
+   });
+   var Simulation = function (a) {    return {ctor: "Simulation",_0: a};};
+   var inputSim = A2($Signal.sampleOn,delta,A2($Signal.map,Simulation,delta));
+   var Insert = function (a) {    return {ctor: "Insert",_0: a};};
+   var input = A2($Signal.merge,A2($Signal.map,Insert,$Drag.mouseEvents),inputSim);
+   var gameState = A3($Signal.foldp,update,game,input);
+   var main = A3($Signal.map2,view,$Window.dimensions,gameState);
+   var Game = F2(function (a,b) {    return {particles: a,clickXY: b};});
+   return _elm.Tidial.values = {_op: _op,main: main};
+};

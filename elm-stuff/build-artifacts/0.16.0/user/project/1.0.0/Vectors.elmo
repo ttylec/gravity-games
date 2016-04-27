@@ -21,5 +21,18 @@ Elm.Vectors.make = function (_elm) {
    _op[".+."] = F2(function (_p15,_p14) {    var _p16 = _p15;var _p17 = _p14;return A2(Vector2D,_p16._0 + _p17._0,_p16._1 + _p17._1);});
    _op["*."] = F2(function (a,_p18) {    var _p19 = _p18;return A2(Vector2D,a * _p19._0,a * _p19._1);});
    _op[".-."] = F2(function (x,y) {    return A2(_op[".+."],x,A2(_op["*."],-1.0,y));});
-   return _elm.Vectors.values = {_op: _op,Vector2D: Vector2D,exterior: exterior,toTuple: toTuple,xcomp: xcomp,ycomp: ycomp,norm: norm};
+   var polar2Cartesian = function (_p20) {
+      var _p21 = _p20;
+      var _p23 = _p21._0;
+      var _p22 = _p21._1;
+      return A2(Vector2D,_p23 * $Basics.cos(_p22),_p23 * $Basics.sin(_p22));
+   };
+   return _elm.Vectors.values = {_op: _op
+                                ,Vector2D: Vector2D
+                                ,exterior: exterior
+                                ,toTuple: toTuple
+                                ,xcomp: xcomp
+                                ,ycomp: ycomp
+                                ,norm: norm
+                                ,polar2Cartesian: polar2Cartesian};
 };

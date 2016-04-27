@@ -1,0 +1,17 @@
+{
+    "version": "1.0.0",
+    "summary": "A low- and high-level interface to mouse drag actions",
+    "repository": "https://github.com/jvoigtlaender/elm-drag.git",
+    "license": "BSD3",
+    "source-directories": [
+        "src"
+    ],
+    "exposed-modules": [
+        "Drag"
+    ],
+    "dependencies": {
+        "elm-lang/core": "2.0.0 <= v < 4.0.0",
+        "evancz/automaton": "1.0.0 <= v < 2.0.0"
+    },
+    "elm-version": "0.15.0 <= v < 0.17.0"
+}

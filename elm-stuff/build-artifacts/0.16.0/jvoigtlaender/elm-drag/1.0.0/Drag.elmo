@@ -1,0 +1,141 @@
+Elm.Drag = Elm.Drag || {};
+Elm.Drag.make = function (_elm) {
+   "use strict";
+   _elm.Drag = _elm.Drag || {};
+   if (_elm.Drag.values) return _elm.Drag.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Automaton = Elm.Automaton.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Mouse = Elm.Mouse.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var Picked = F3(function (a,b,c) {    return {ctor: "Picked",_0: a,_1: b,_2: c};});
+   var Inside = function (a) {    return {ctor: "Inside",_0: a};};
+   var Outside = {ctor: "Outside"};
+   var Hover = function (a) {    return {ctor: "Hover",_0: a};};
+   var Mouse = function (a) {    return {ctor: "Mouse",_0: a};};
+   var Release = {ctor: "Release"};
+   var MoveBy = function (a) {    return {ctor: "MoveBy",_0: a};};
+   var Lift = {ctor: "Lift"};
+   var automatonStep = F2(function (event,old) {
+      var _p0 = {ctor: "_Tuple2",_0: old,_1: event};
+      _v0_6: do {
+         if (_p0.ctor === "_Tuple2") {
+               if (_p0._1.ctor === "Mouse") {
+                     switch (_p0._0.ctor)
+                     {case "Inside": if (_p0._1._0.ctor === "StartAt") {
+                                var _p1 = _p0._0._0;
+                                return {ctor: "_Tuple2",_0: $Maybe.Just({ctor: "_Tuple2",_0: _p1,_1: Lift}),_1: A3(Picked,_p1,_p0._1._0._0,$Maybe.Nothing)};
+                             } else {
+                                break _v0_6;
+                             }
+                        case "Picked": switch (_p0._1._0.ctor)
+                          {case "MoveFromTo": var _p5 = _p0._1._0._1;
+                               var _p4 = _p0._0._0;
+                               var _p2 = _p5;
+                               var x$ = _p2._0;
+                               var y$ = _p2._1;
+                               var _p3 = _p0._0._1;
+                               var x = _p3._0;
+                               var y = _p3._1;
+                               return {ctor: "_Tuple2"
+                                      ,_0: $Maybe.Just({ctor: "_Tuple2",_0: _p4,_1: MoveBy({ctor: "_Tuple2",_0: x$ - x,_1: y$ - y})})
+                                      ,_1: A3(Picked,_p4,_p5,_p0._0._2)};
+                             case "EndAt": var _p6 = _p0._0._0;
+                               return {ctor: "_Tuple2",_0: $Maybe.Just({ctor: "_Tuple2",_0: _p6,_1: Release}),_1: Inside(A2($Maybe.withDefault,_p6,_p0._0._2))};
+                             default: break _v0_6;}
+                        default: break _v0_6;}
+                  } else {
+                     switch (_p0._0.ctor)
+                     {case "Outside": if (_p0._1._0.ctor === "Just") {
+                                return {ctor: "_Tuple2",_0: $Maybe.Nothing,_1: Inside(_p0._1._0._0)};
+                             } else {
+                                break _v0_6;
+                             }
+                        case "Inside": return {ctor: "_Tuple2",_0: $Maybe.Nothing,_1: A2($Maybe.withDefault,Outside,A2($Maybe.map,Inside,_p0._1._0))};
+                        default: return {ctor: "_Tuple2",_0: $Maybe.Nothing,_1: A3(Picked,_p0._0._0,_p0._0._1,_p0._1._0)};}
+                  }
+            } else {
+               break _v0_6;
+            }
+      } while (false);
+      return {ctor: "_Tuple2",_0: $Maybe.Nothing,_1: old};
+   });
+   var automaton = function (inside) {    return A2($Automaton.hiddenState,A2($Maybe.withDefault,Outside,A2($Maybe.map,Inside,inside)),automatonStep);};
+   var EndAt = function (a) {    return {ctor: "EndAt",_0: a};};
+   var MoveFromTo = F2(function (a,b) {    return {ctor: "MoveFromTo",_0: a,_1: b};});
+   var StartAt = function (a) {    return {ctor: "StartAt",_0: a};};
+   var mouseEvents = function () {
+      var isJust = function (b) {    var _p7 = b;if (_p7.ctor === "Just") {    return true;} else {    return false;}};
+      var assertEqual = $Basics.always;
+      var f = F2(function (_p8,old) {
+         var _p9 = _p8;
+         var _p11 = _p9._1;
+         var _p10 = {ctor: "_Tuple2",_0: old,_1: _p9._0};
+         _v3_5: do {
+            _v3_4: do {
+               if (_p10.ctor === "_Tuple2") {
+                     if (_p10._0.ctor === "Just") {
+                           switch (_p10._0._0.ctor)
+                           {case "StartAt": if (_p10._1 === true) {
+                                      return $Maybe.Just(A2(MoveFromTo,_p10._0._0._0,_p11));
+                                   } else {
+                                      return $Maybe.Just(EndAt(A2(assertEqual,_p10._0._0._0,_p11)));
+                                   }
+                              case "MoveFromTo": if (_p10._1 === true) {
+                                      return $Maybe.Just(A2(MoveFromTo,_p10._0._0._1,_p11));
+                                   } else {
+                                      return $Maybe.Just(EndAt(A2(assertEqual,_p10._0._0._1,_p11)));
+                                   }
+                              default: if (_p10._1 === true) {
+                                      break _v3_4;
+                                   } else {
+                                      break _v3_5;
+                                   }}
+                        } else {
+                           if (_p10._1 === true) {
+                                 break _v3_4;
+                              } else {
+                                 break _v3_5;
+                              }
+                        }
+                  } else {
+                     break _v3_5;
+                  }
+            } while (false);
+            return $Maybe.Just(StartAt(_p11));
+         } while (false);
+         return $Maybe.Nothing;
+      });
+      return A2($Signal.map,
+      $Maybe.withDefault(EndAt({ctor: "_Tuple2",_0: 0,_1: 0})),
+      A3($Signal.filter,
+      isJust,
+      $Maybe.Nothing,
+      A3($Signal.foldp,f,$Maybe.Nothing,A3($Signal.map2,F2(function (v0,v1) {    return {ctor: "_Tuple2",_0: v0,_1: v1};}),$Mouse.isDown,$Mouse.position))));
+   }();
+   var trackMany = F2(function (inside,hover) {
+      return A3($Automaton.run,automaton(inside),$Maybe.Nothing,A2($Signal.merge,A2($Signal.map,Mouse,mouseEvents),A2($Signal.map,Hover,hover)));
+   });
+   var track = F2(function (inside,hover) {
+      var btm = function (b) {    return b ? $Maybe.Just({ctor: "_Tuple0"}) : $Maybe.Nothing;};
+      return A2($Signal.map,$Maybe.map($Basics.snd),A2(trackMany,btm(inside),A2($Signal.map,btm,hover)));
+   });
+   return _elm.Drag.values = {_op: _op
+                             ,mouseEvents: mouseEvents
+                             ,track: track
+                             ,trackMany: trackMany
+                             ,automaton: automaton
+                             ,StartAt: StartAt
+                             ,MoveFromTo: MoveFromTo
+                             ,EndAt: EndAt
+                             ,Lift: Lift
+                             ,MoveBy: MoveBy
+                             ,Release: Release
+                             ,Mouse: Mouse
+                             ,Hover: Hover};
+};

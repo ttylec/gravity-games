@@ -1,3 +1,5 @@
 {
+    "evancz/automaton": "1.1.0",
+    "jvoigtlaender/elm-drag": "1.0.0",
     "elm-lang/core": "3.0.0"
 }
