@@ -1,4 +1,4 @@
-module Tidial (main) where
+module Tidal (main) where
 
 import Color exposing (..)
 import Graphics.Collage exposing (..)
