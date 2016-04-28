@@ -43,6 +43,20 @@ elementsMars =
   , meanL = degrees 355
   }
 
+elementsVenus =
+    { sma = 0.72 * au
+    , e = 0.007
+    , omega =  degrees 131
+    , meanL = degrees 182
+  }
+
+elementsComet =
+    { sma = 1.7 * au
+    , e = 0.9
+    , omega =  degrees 0
+    , meanL = degrees 0
+    }
+
 earth = { renderer = oval 10 10 |> filled green
         , size = 5
         , orbit = elementsEarth
@@ -61,6 +75,26 @@ mars = { renderer = oval 5 5 |> filled red
        , orientation = 0
        }
 
+venus = { renderer = oval 5 5 |> filled orange
+       , size = 5
+       , orbit = elementsVenus
+       , color = blue
+       , position = getPosition elementsVenus
+       , velocity = getVelocity gm elementsVenus
+       , orientation = 0
+       }
+
+
+comet = { renderer = oval 3 3 |> filled white
+        , size = 2
+        , orbit = elementsComet
+        , color = blue
+        , position = getPosition elementsComet
+        , velocity = getVelocity gm elementsComet
+        , orientation = 0
+        }
+
+
 spaceship = { renderer = shipRenderer
             , size = 7.5
             , orbit = elementsEarth
@@ -69,7 +103,7 @@ spaceship = { renderer = shipRenderer
             , velocity = getVelocity gm elementsEarth
             , orientation = pi / 4}
 
-system = { planets = [earth, mars]
+system = { planets = [earth, mars, venus, comet]
          , spaceship = spaceship
          , drawOrbits = False
          }
