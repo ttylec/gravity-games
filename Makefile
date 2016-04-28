@@ -8,8 +8,8 @@ mars: mars.elm $(LIBS)
 shooter: shooter.elm $(LIBS)
 	elm-make shooter.elm --output shooter.js
 
-tidial: tidial.elm $(LIBS)
-	elm-make tidial.elm --output tidial.js
+tidial: tidal.elm $(LIBS)
+	elm-make tidal.elm --output tidal.js
 
 clean:
 	rm -f *.js
