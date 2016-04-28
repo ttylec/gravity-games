@@ -128,10 +128,10 @@ view (w, h) game =
     bullets = map (drawObject game.drawOrbits) game.bullets
     ship1 = [drawShip game.drawOrbits game.ship1]
     ship2 = [drawShip game.drawOrbits game.ship2]
-    energies = [ viewEnergy game.ship1 |> move (-gameWidth/2 + 10, -gameHeight/2 + 10)
-               , viewEnergy game.ship2 |> move (gameWidth/2 - 10, -gameHeight/2 + 10)]
-    scores = [ viewScore game.score1 |> move (-gameWidth/2 + 10, -gameHeight/2 + 130)
-             , viewScore game.score2 |> move (gameWidth/2 - 10, -gameHeight/2 + 130)]
+    energies = [ viewEnergy game.ship2 |> move (-gameWidth/2 + 10, -gameHeight/2 + 10)
+               , viewEnergy game.ship1 |> move (gameWidth/2 - 10, -gameHeight/2 + 10)]
+    scores = [ viewScore game.score2 |> move (-gameWidth/2 + 10, -gameHeight/2 + 130)
+             , viewScore game.score1 |> move (gameWidth/2 - 10, -gameHeight/2 + 130)]
   in
     container w h middle <|
               collage gameWidth gameHeight <|
