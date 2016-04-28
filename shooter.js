@@ -7166,10 +7166,10 @@ Elm.Shooter.make = function (_elm) {
    var gameWidth = 800;
    var view = F2(function (_p3,game) {
       var _p4 = _p3;
-      var scores = _U.list([A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: (0 - gameWidth) / 2 + 10,_1: (0 - gameHeight) / 2 + 130},viewScore(game.score1))
-                           ,A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: gameWidth / 2 - 10,_1: (0 - gameHeight) / 2 + 130},viewScore(game.score2))]);
-      var energies = _U.list([A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: (0 - gameWidth) / 2 + 10,_1: (0 - gameHeight) / 2 + 10},viewEnergy(game.ship1))
-                             ,A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: gameWidth / 2 - 10,_1: (0 - gameHeight) / 2 + 10},viewEnergy(game.ship2))]);
+      var scores = _U.list([A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: (0 - gameWidth) / 2 + 10,_1: (0 - gameHeight) / 2 + 130},viewScore(game.score2))
+                           ,A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: gameWidth / 2 - 10,_1: (0 - gameHeight) / 2 + 130},viewScore(game.score1))]);
+      var energies = _U.list([A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: (0 - gameWidth) / 2 + 10,_1: (0 - gameHeight) / 2 + 10},viewEnergy(game.ship2))
+                             ,A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: gameWidth / 2 - 10,_1: (0 - gameHeight) / 2 + 10},viewEnergy(game.ship1))]);
       var ship2 = _U.list([A2(drawShip,game.drawOrbits,game.ship2)]);
       var ship1 = _U.list([A2(drawShip,game.drawOrbits,game.ship1)]);
       var bullets = A2($List.map,$SpaceSim.drawObject(game.drawOrbits),game.bullets);

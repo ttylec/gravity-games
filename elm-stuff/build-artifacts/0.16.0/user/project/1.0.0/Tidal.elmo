@@ -1,8 +1,8 @@
-Elm.Tidial = Elm.Tidial || {};
-Elm.Tidial.make = function (_elm) {
+Elm.Tidal = Elm.Tidal || {};
+Elm.Tidal.make = function (_elm) {
    "use strict";
-   _elm.Tidial = _elm.Tidial || {};
-   if (_elm.Tidial.values) return _elm.Tidial.values;
+   _elm.Tidal = _elm.Tidal || {};
+   if (_elm.Tidal.values) return _elm.Tidal.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Color = Elm.Color.make(_elm),
@@ -124,5 +124,5 @@ Elm.Tidial.make = function (_elm) {
    var gameState = A3($Signal.foldp,update,game,input);
    var main = A3($Signal.map2,view,$Window.dimensions,gameState);
    var Game = F2(function (a,b) {    return {particles: a,clickXY: b};});
-   return _elm.Tidial.values = {_op: _op,main: main};
+   return _elm.Tidal.values = {_op: _op,main: main};
 };
