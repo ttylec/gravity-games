@@ -47,6 +47,8 @@ Elm.Mars.make = function (_elm) {
    var au = 150;
    var elementsEarth = {sma: au,e: 1.7e-2,omega: $Basics.degrees(103),meanL: $Basics.degrees(100)};
    var elementsMars = {sma: 1.52 * au,e: 9.3e-2,omega: $Basics.degrees(336),meanL: $Basics.degrees(355)};
+   var elementsVenus = {sma: 0.72 * au,e: 7.0e-3,omega: $Basics.degrees(131),meanL: $Basics.degrees(182)};
+   var elementsComet = {sma: 1.7 * au,e: 0.9,omega: $Basics.degrees(0),meanL: $Basics.degrees(0)};
    var earthT = 36;
    var gm = 4 * Math.pow($Basics.pi,2) * Math.pow(au,3) / Math.pow(earthT,2);
    var earth = {renderer: A2($Graphics$Collage.filled,$Color.green,A2($Graphics$Collage.oval,10,10))
@@ -63,6 +65,20 @@ Elm.Mars.make = function (_elm) {
               ,position: $SpaceSim.getPosition(elementsMars)
               ,velocity: A2($SpaceSim.getVelocity,gm,elementsMars)
               ,orientation: 0};
+   var venus = {renderer: A2($Graphics$Collage.filled,$Color.orange,A2($Graphics$Collage.oval,5,5))
+               ,size: 5
+               ,orbit: elementsVenus
+               ,color: $Color.blue
+               ,position: $SpaceSim.getPosition(elementsVenus)
+               ,velocity: A2($SpaceSim.getVelocity,gm,elementsVenus)
+               ,orientation: 0};
+   var comet = {renderer: A2($Graphics$Collage.filled,$Color.white,A2($Graphics$Collage.oval,3,3))
+               ,size: 2
+               ,orbit: elementsComet
+               ,color: $Color.blue
+               ,position: $SpaceSim.getPosition(elementsComet)
+               ,velocity: A2($SpaceSim.getVelocity,gm,elementsComet)
+               ,orientation: 0};
    var spaceship = {renderer: shipRenderer
                    ,size: 7.5
                    ,orbit: elementsEarth
@@ -70,7 +86,7 @@ Elm.Mars.make = function (_elm) {
                    ,position: $SpaceSim.getPosition(elementsEarth)
                    ,velocity: A2($SpaceSim.getVelocity,gm,elementsEarth)
                    ,orientation: $Basics.pi / 4};
-   var system = {planets: _U.list([earth,mars]),spaceship: spaceship,drawOrbits: false};
+   var system = {planets: _U.list([earth,mars,venus,comet]),spaceship: spaceship,drawOrbits: false};
    var accel = 1;
    var rotationSpeed = -1 * $Basics.degrees(360);
    var update = F2(function (input,system) {
